@@ -1,17 +1,19 @@
-import { Expose } from "class-transformer";
+import { Expose, Type } from "class-transformer";
+import { RoleResponseDto } from "src/modules/roles/dto/role-response.dto";
 
 export class EmployeeResponseDto{
     
     @Expose()
-    cc: number;
+    cc: string;
 
     @Expose()
     name: string;
 
     @Expose()
-    password: string;
+    state: string; 
 
     @Expose()
-    role_name: string;
+    @Type(() => RoleResponseDto) 
+    role: RoleResponseDto;
 
 }

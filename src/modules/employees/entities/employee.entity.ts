@@ -15,7 +15,7 @@ export class Employee{
     id_role: number;
 
     @Column({length:15 ,unique: true})
-    cc: number;
+    cc: string;
 
     @Column({type: 'varchar', length: 50})
     name: string;

@@ -24,11 +24,20 @@ export class EmployeesService {
         if(!employees || employees.length === 0){
             throw new NotFoundException('Aún no hay trabajadores en el sistema')
         }
-
-        return employees.map(employee => plainToInstance(EmployeeResponseDto, employee))
+        return employees.map(employee => plainToInstance(EmployeeResponseDto, employee, { excludeExtraneousValues: true }))
     }
 
-    async findByCc(cc: number): Promise<EmployeeResponseDto>{
+    async findById(id: number): Promise<EmployeeResponseDto>{
+        const employee = await this.employeeRepository.findOneBy({id_employee: id});
+        
+        if(!employee){
+            throw new NotFoundException('El trabajador no existe');
+        }
+
+        return plainToInstance(EmployeeResponseDto, employee, {excludeExtraneousValues: true})
+    }
+
+    async findByCc(cc: string): Promise<EmployeeResponseDto>{
         const employee = await this.employeeRepository.findOneBy({cc: cc});
         
         if(!employee){
@@ -55,7 +64,7 @@ export class EmployeesService {
         const hashedPassword = await bcrypt.hash(createEmployee.password, saltRounds);
         const newEmployee = this.employeeRepository.create({...createEmployee, password: hashedPassword, state: States.ACTIVE, role: existingRole});
         const savedEmployee = await this.employeeRepository.save(newEmployee);
-        return plainToInstance(EmployeeResponseDto, savedEmployee)
+        return plainToInstance(EmployeeResponseDto, savedEmployee, {excludeExtraneousValues: true})
     }
 
     async updateEmployee(id: number, updateEmployee: UpdateEmployeeDto): Promise<UpdateEmployeeResponseDto>{
@@ -83,7 +92,7 @@ export class EmployeesService {
         }
 
         await this.employeeRepository.remove(existingEmployee);
-        return plainToInstance(EmployeeResponseDto, existingEmployee)
+        return plainToInstance(EmployeeResponseDto, existingEmployee, {excludeExtraneousValues: true})
     }
 
 }

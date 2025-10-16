@@ -5,6 +5,7 @@ import { RolesModule } from './modules/roles/roles.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmployeesModule } from './modules/employees/employees.module';
+import { AreasModule } from './modules/areas/areas.module';
 
 @Module({
   imports: [RolesModule, 
@@ -18,12 +19,13 @@ import { EmployeesModule } from './modules/employees/employees.module';
       port: configService.get<number>('DB_PORT'),
       username: configService.get<string>('DB_USERNAME'),
       password: configService.get<string>('DB_PASSWORD'),
-      database: configService.get<string>('DB_DATABASE'),
+      database: configService.get<string>('DB_DATABASE'), //Cambiar por SID
       entities: [__dirname + '/**/*.entity{.ts,.js}'], 
       synchronize: true,
     })
   }),
     EmployeesModule,
+    AreasModule,
    ],
   controllers: [AppController],
   providers: [AppService],

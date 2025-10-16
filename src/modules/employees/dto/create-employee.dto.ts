@@ -7,8 +7,8 @@ export class CreateEmployeeDto{
     id_role: number;
     
     @IsNotEmpty({message: 'La cédula es obligatoria'})
-    @IsInt({message: 'La cédula debe ser digitada sin puntos'})
-    cc: number;
+    @IsString()
+    cc: string;
     
     @IsNotEmpty({message: 'El nombre es obligatorio'})
     @IsString({message: 'El nombre debe contener letras'})
