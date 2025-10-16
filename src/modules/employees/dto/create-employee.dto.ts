@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsArray, IsInt, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateEmployeeDto{
 
@@ -17,4 +17,5 @@ export class CreateEmployeeDto{
     @IsNotEmpty({message: 'La contraseña es obligatoria'})
     @IsString({message: 'La contraseña debe contener letras'})
     password: string;
+
 }

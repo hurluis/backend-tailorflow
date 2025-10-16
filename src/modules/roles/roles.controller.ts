@@ -5,6 +5,7 @@ import { RoleResponseDto } from './dto/role-response.dto';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { UpdateRoleResposeDto } from './dto/update-role-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('roles')
 export class RolesController {
@@ -23,10 +24,12 @@ export class RolesController {
     @Get(':id')
     async findById(@Param('id') id: string): Promise<BaseApplicationResponseDto<RoleResponseDto>>{
         const role = await this.rolesService.findById(+id);
+        const data = plainToInstance(RoleResponseDto, role, {excludeExtraneousValues: true});
+
         return{
             statusCode: 200, 
             message: 'Rol obtenido correctamente',
-            data: role
+            data: data
         }
     }
 

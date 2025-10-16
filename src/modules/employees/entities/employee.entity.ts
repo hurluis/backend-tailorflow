@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Role } from "src/modules/roles/entities/role.entity";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum States {
     ACTIVE = 'ACTIVE',
@@ -13,18 +14,19 @@ export class Employee{
     @Column()
     id_role: number;
 
-    @Column()
-    id_area: number;
-
-    @Column({unique: true})
+    @Column({length:15 ,unique: true})
     cc: number;
 
-    @Column()
+    @Column({type: 'varchar', length: 50})
     name: string;
 
-    @Column()
+    @Column({type: 'varchar', length: 255})
     password: string;
 
     @Column({default: States.ACTIVE})
     state: States;
+
+    @ManyToOne(() => Role, role => role.employees)
+    @JoinColumn({ name: 'id_role' })
+    role: Role;
 }
