@@ -1,12 +1,12 @@
-import { IsEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export class CreateRoleDto{
     
-    @IsEmpty({message: 'El nombre es obligatorio'})
+    @IsNotEmpty({message: 'El nombre es obligatorio'})
     @IsString({message: 'El nombre debe contener letras'})
     name: string;
 
-    @IsEmpty({message:'La descripción es obligatoria'})
+    @IsNotEmpty({message:'La descripción es obligatoria'})
     @IsString({message: 'La descripción debe contener letras'})
     description: string;
     

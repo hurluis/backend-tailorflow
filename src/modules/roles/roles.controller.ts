@@ -20,9 +20,9 @@ export class RolesController {
         }
     }
 
-    @Get()
-    async findById(@Body() id: number): Promise<BaseApplicationResponseDto<RoleResponseDto>>{
-        const role = await this.rolesService.findById(id);
+    @Get(':id')
+    async findById(@Param('id') id: string): Promise<BaseApplicationResponseDto<RoleResponseDto>>{
+        const role = await this.rolesService.findById(+id);
         return{
             statusCode: 200, 
             message: 'Rol obtenido correctamente',

@@ -52,7 +52,7 @@ export class RolesService {
         }
         
         const savedRole = await this.roleRepository.save(existingRole);
-        return plainToInstance(UpdateRoleResposeDto, savedRole)
+        return plainToInstance(UpdateRoleResposeDto, savedRole, {excludeExtraneousValues: true})
     }
 
     async deleteRole(id: number): Promise<RoleResponseDto>{
