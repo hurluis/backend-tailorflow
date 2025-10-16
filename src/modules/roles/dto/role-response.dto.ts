@@ -1,6 +1,6 @@
 import { Expose } from "class-transformer";
 
-export class Role{
+export class RoleResponseDto{
     @Expose()
     name: string;
 }
