@@ -66,7 +66,7 @@ export class RolesService {
         }
 
         await this.roleRepository.remove(existingRole);
-        return plainToInstance(RoleResponseDto, existingRole)
+        return plainToInstance(RoleResponseDto, existingRole, {excludeExtraneousValues: true})
     }
 
 }
