@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmployeesModule } from './modules/employees/employees.module';
 import { AreasModule } from './modules/areas/areas.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [RolesModule, 
@@ -26,6 +27,7 @@ import { AreasModule } from './modules/areas/areas.module';
   }),
     EmployeesModule,
     AreasModule,
+    CategoriesModule,
    ],
   controllers: [AppController],
   providers: [AppService],
