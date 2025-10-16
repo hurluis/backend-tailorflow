@@ -27,6 +27,16 @@ export class EmployeesService {
         return employees.map(employee => plainToInstance(EmployeeResponseDto, employee, { excludeExtraneousValues: true }))
     }
 
+    async findById(id: number): Promise<EmployeeResponseDto>{
+        const employee = await this.employeeRepository.findOneBy({id_employee: id});
+        
+        if(!employee){
+            throw new NotFoundException('El trabajador no existe');
+        }
+
+        return plainToInstance(EmployeeResponseDto, employee, {excludeExtraneousValues: true})
+    }
+
     async findByCc(cc: string): Promise<EmployeeResponseDto>{
         const employee = await this.employeeRepository.findOneBy({cc: cc});
         

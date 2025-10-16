@@ -22,8 +22,8 @@ export class EmployeesController {
     }
 
     @Get(':id')
-    async findByCc(@Param('id') id: string): Promise<BaseApplicationResponseDto<EmployeeResponseDto>>{
-        const employee = await this.employessService.findByCc(id);
+    async findById(@Param('id') id: string): Promise<BaseApplicationResponseDto<EmployeeResponseDto>>{
+        const employee = await this.employessService.findById(+id);
         return{
             statusCode: 200, 
             message: 'Trabajador obtenido correctamente',
