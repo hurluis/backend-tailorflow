@@ -22,14 +22,13 @@ export class RolesService {
         return roles.map(role => plainToInstance(RoleResponseDto, role, {excludeExtraneousValues: true}))
     }
 
-    async findById(id:number): Promise<RoleResponseDto>{
+    async findById(id:number): Promise<Role>{
         const role = await this.roleRepository.findOneBy({id_role: id});
 
         if(!role){
             throw new NotFoundException('Rol no encontrado');
         }
-
-        return plainToInstance(RoleResponseDto, role, {excludeExtraneousValues: true});
+        return role;
     }
 
     async createRole(createRole: CreateRoleDto): Promise<RoleResponseDto>{
@@ -40,7 +39,7 @@ export class RolesService {
         }
 
         const newRole = this.roleRepository.create(createRole);
-        const savedRole = this.roleRepository.save(newRole);
+        const savedRole = await this.roleRepository.save(newRole);
         return plainToInstance(RoleResponseDto, savedRole, {excludeExtraneousValues: true})
     }
 
@@ -56,10 +55,14 @@ export class RolesService {
     }
 
     async deleteRole(id: number): Promise<RoleResponseDto>{
-        const existingRole = await this.roleRepository.findOneBy({id_role: id});
+        const existingRole = await this.roleRepository.findOne({where: {id_role: id}, relations: ['employees']}, );
 
         if(!existingRole){
             throw new NotFoundException('El rol no existe en el sistema');
+        }
+
+        if(existingRole.employees.length > 0){
+            throw new BadRequestException('No se puede eliminar el rol porque tiene empleados asociados')
         }
 
         await this.roleRepository.remove(existingRole);
