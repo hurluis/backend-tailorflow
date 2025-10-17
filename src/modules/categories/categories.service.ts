@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -48,6 +48,7 @@ export class CategoriesService {
   }
 
   async updateCategory(id: number, updateCategory: UpdateCategoryDto): Promise<CategoryResponseDto> {
+        
     const category = await this.categoryRepository.preload({id_category: id,...updateCategory});
 
     if (!category) {
@@ -55,11 +56,12 @@ export class CategoriesService {
     }
 
     if(updateCategory.name){
-        const existingNameCategory = await this.categoryRepository.findOneBy({name: updateCategory.name});
+      const existingNameCategory = await this.categoryRepository.findOneBy({name: updateCategory.name,id_category: Not(id) });
 
-        if(existingNameCategory) {
-            throw new BadRequestException('Ya existe un área con ese nombre');
-        }
+      if(existingNameCategory) {
+               
+        throw new BadRequestException('Ya existe otra categoría con ese nombre');
+      }
     }
 
     const saved = await this.categoryRepository.save(category);

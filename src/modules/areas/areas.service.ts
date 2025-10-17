@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Area } from './entities/area.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { plainToInstance } from 'class-transformer';
 import { AreaResponseDto } from './dto/area-respose.dto';
@@ -10,12 +10,12 @@ import { AreaResponseDto } from './dto/area-respose.dto';
 export class AreasService {
   constructor(
     @InjectRepository(Area) private areaRepository: Repository<Area>,
-  ) {}
+  ) { }
 
   async findAll(): Promise<AreaResponseDto[]> {
     const areas = await this.areaRepository.find({ relations: ['roles'] });
 
-    if(!areas || areas.length === 0) {
+    if (!areas || areas.length === 0) {
       throw new NotFoundException('Aún no hay áreas en el sistema');
     }
 
@@ -24,11 +24,11 @@ export class AreasService {
 
   async findById(id: number): Promise<AreaResponseDto> {
 
-    const area = await this.areaRepository.findOne({where: { id_area: id }, relations: ['roles'],});
+    const area = await this.areaRepository.findOne({ where: { id_area: id }, relations: ['roles'], });
 
-    if(!area){
-        throw new NotFoundException('Área no encontrada');
-    } 
+    if (!area) {
+      throw new NotFoundException('Área no encontrada');
+    }
 
     return plainToInstance(AreaResponseDto, area, { excludeExtraneousValues: true });
   }
@@ -36,9 +36,9 @@ export class AreasService {
   async createArea(createArea: CreateAreaDto): Promise<AreaResponseDto> {
     const exists = await this.areaRepository.findOneBy({ name: createArea.name });
 
-    if(exists){
-        throw new BadRequestException('Ya existe un área con ese nombre');
-    } 
+    if (exists) {
+      throw new BadRequestException('Ya existe un área con ese nombre');
+    }
 
     const newArea = this.areaRepository.create(createArea);
     const saved = await this.areaRepository.save(newArea);
@@ -47,16 +47,16 @@ export class AreasService {
 
   async updateArea(id: number, updateArea: CreateAreaDto): Promise<AreaResponseDto> {
 
-    const area = await this.areaRepository.preload({ id_area: id, ...updateArea });
+    const areaWithSameName = await this.areaRepository.findOneBy({ name: updateArea.name, id_area: Not(id) });
 
-    if(!area){
-        throw new NotFoundException('Área no encontrada');
+    if (areaWithSameName) {
+      throw new BadRequestException('Ya existe otra área con ese nombre');
     }
-    
-    const newAreaName = await this.areaRepository.findOneBy({ name: updateArea.name });
 
-    if(newAreaName) {
-      throw new BadRequestException('Ya existe un área con ese nombre');
+    const area = await this.areaRepository.preload({ id_area: id, name: updateArea.name });
+
+    if (!area) {
+      throw new NotFoundException('Área no encontrada');
     }
 
     const saved = await this.areaRepository.save(area);
@@ -66,9 +66,13 @@ export class AreasService {
   async deleteArea(id: number): Promise<AreaResponseDto> {
     const area = await this.areaRepository.findOne({ where: { id_area: id }, relations: ['roles'] });
 
-    if (!area){
-        throw new NotFoundException('Área no encontrada');
-    } 
+    if (!area) {
+      throw new NotFoundException('Área no encontrada');
+    }
+
+    if (area.roles && area.roles.length > 0) {
+      throw new BadRequestException('No se puede eliminar el área porque tiene roles asociados');
+    }
 
     await this.areaRepository.remove(area);
     return plainToInstance(AreaResponseDto, area, { excludeExtraneousValues: true });

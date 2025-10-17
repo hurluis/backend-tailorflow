@@ -15,14 +15,15 @@ import { CategoriesModule } from './modules/categories/categories.module';
     imports: [ConfigModule],
     inject: [ConfigService],
     useFactory: (configService : ConfigService) => ({
-      type: 'mysql',
+      type: 'oracle',
       host: configService.get<string>('DB_HOST'),
       port: configService.get<number>('DB_PORT'),
       username: configService.get<string>('DB_USERNAME'),
       password: configService.get<string>('DB_PASSWORD'),
-      database: configService.get<string>('DB_DATABASE'), //Cambiar por SID
+      serviceName: configService.get<string>('SERVICE_NAME'),
+      schema: configService.get<string>('DB_SCHEMA'),
       entities: [__dirname + '/**/*.entity{.ts,.js}'], 
-      synchronize: true,
+      synchronize: false,
     })
   }),
     EmployeesModule,

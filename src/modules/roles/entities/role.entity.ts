@@ -1,29 +1,26 @@
 import { Area } from "src/modules/areas/entities/area.entity";
 import { Employee } from "src/modules/employees/entities/employee.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Generated, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, Unique } from "typeorm";
 
 @Entity('ROLES')
+@Unique(['id_area', 'name'])
 export class Role{
-    @PrimaryGeneratedColumn()
+    
+    @PrimaryColumn({ name: 'ID_ROLE', type: 'number'})
+    @Generated('increment') 
     id_role: number;
 
-     @Column({ nullable: true })
-    id_area: number;
-    //ESTO PARA ORACLE
-    /*@Column({type: 'varchar2', length: 50, unique: true})
-    name: string;
+    @Column({ name: 'ID_AREA', type: 'number' }) 
+    id_area: number; 
 
-    @Column({type: 'varchar2', length: 100, nullable: true})
-    description: string;*/
+    @Column({ name: 'NAME', type: 'varchar2', length: 50 }) 
+    name: string; 
 
-    @Column({type: 'varchar', length: 50, unique: true})
-    name: string;
-
-    @Column({type: 'varchar', length: 100, nullable: true})
+    @Column({ name: 'DESCRIPTION', type: 'varchar2', length: 100, nullable: true }) 
     description: string;
 
     @ManyToOne(() => Area, area => area.roles, { onDelete: 'SET NULL', nullable: true })
-    @JoinColumn({ name: 'id_area' })
+    @JoinColumn({ name: 'ID_AREA' })
     area: Area;
 
     @OneToMany(()=> Employee, emp => emp.role)

@@ -1,32 +1,35 @@
 import { Role } from "src/modules/roles/entities/role.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, Check, PrimaryColumn, Generated } from "typeorm";
 
 export enum States {
-    ACTIVE = 'ACTIVE',
-    INACTIVE = 'INACTIVE'
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
 }
 
+@Check(`"STATE" IN ('ACTIVE', 'INACTIVE')`)
 @Entity('EMPLOYEES')
-export class Employee{
-    @PrimaryGeneratedColumn()
-    id_employee: number;
+export class Employee {
 
-    @Column()
-    id_role: number;
+  @PrimaryColumn({ name: 'ID_EMPLOYEE', type: 'number' })
+  @Generated('increment')
+  id_employee: number;
 
-    @Column({length:15 ,unique: true})
-    cc: string;
+  @Column({ name: 'ID_ROLE', type: 'number' })
+  id_role: number;
 
-    @Column({type: 'varchar', length: 50})
-    name: string;
+  @Column({ name: 'CC', type: 'varchar2', length: 20, unique: true })
+  cc: string;
 
-    @Column({type: 'varchar', length: 255})
-    password: string;
+  @Column({ name: 'NAME', type: 'varchar2', length: 100 })
+  name: string;
 
-    @Column({default: States.ACTIVE})
-    state: States;
+  @Column({ name: 'PASSWORD', type: 'varchar2', length: 255 })
+  password: string;
 
-    @ManyToOne(() => Role, role => role.employees)
-    @JoinColumn({ name: 'id_role' })
-    role: Role;
+  @Column({ name: 'STATE', type: 'varchar2', length: 20, default: States.ACTIVE })
+  state: States;
+
+  @ManyToOne(() => Role, role => role.employees, { nullable: false })
+  @JoinColumn({ name: 'ID_ROLE' })
+  role: Role;
 }

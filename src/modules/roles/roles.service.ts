@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { RoleResponseDto } from './dto/role-response.dto';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -32,14 +32,15 @@ export class RolesService {
     }
 
     async createRole(createRole: CreateRoleDto): Promise<RoleResponseDto>{
-        const existingRole = await this.roleRepository.findOneBy({name: createRole.name});
+        const existingRole = await this.roleRepository.findOneBy({id_area: createRole.id_area,name: createRole.name});
 
         if(existingRole){
-            throw new BadRequestException('El rol ya existe en el sistema');
+            throw new BadRequestException('El rol ya existe en el sistema para esa área');
         }
 
         const newRole = this.roleRepository.create(createRole);
-        const savedRole = await this.roleRepository.save(newRole);
+        
+        const savedRole = await this.roleRepository.save(newRole); 
         return plainToInstance(RoleResponseDto, savedRole, {excludeExtraneousValues: true})
     }
 
@@ -51,13 +52,12 @@ export class RolesService {
         }
 
         if(updateRole.name){
-            const existingRoleName = await this.roleRepository.findOneBy({name: updateRole.name});
+            const roleWithSameNameInArea = await this.roleRepository.findOneBy({id_area: existingRole.id_area, name: updateRole.name,id_role: Not(id)});
 
-            if(existingRoleName){
-                throw new BadRequestException('El nombre del rol ya existe en el sistema');
+            if(roleWithSameNameInArea){
+                throw new BadRequestException('El nuevo nombre del rol ya lo usa otro rol en esta área');
             }
         }
-    
         
         const savedRole = await this.roleRepository.save(existingRole);
         return plainToInstance(UpdateRoleResposeDto, savedRole, {excludeExtraneousValues: true})
