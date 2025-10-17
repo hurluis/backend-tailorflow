@@ -33,26 +33,27 @@ export class AreasService {
     return plainToInstance(AreaResponseDto, area, { excludeExtraneousValues: true });
   }
 
-  async createArea(createDto: CreateAreaDto): Promise<AreaResponseDto> {
-    const exists = await this.areaRepository.findOneBy({ name: createDto.name });
+  async createArea(createArea: CreateAreaDto): Promise<AreaResponseDto> {
+    const exists = await this.areaRepository.findOneBy({ name: createArea.name });
 
     if(exists){
         throw new BadRequestException('Ya existe un área con ese nombre');
     } 
 
-    const newArea = this.areaRepository.create(createDto);
+    const newArea = this.areaRepository.create(createArea);
     const saved = await this.areaRepository.save(newArea);
     return plainToInstance(AreaResponseDto, saved, { excludeExtraneousValues: true });
   }
 
-  async updateArea(id: number, updateDto: CreateAreaDto): Promise<AreaResponseDto> {
+  async updateArea(id: number, updateArea: CreateAreaDto): Promise<AreaResponseDto> {
 
-    const area = await this.areaRepository.preload({ id_area: id, ...updateDto });
+    const area = await this.areaRepository.preload({ id_area: id, ...updateArea });
 
     if(!area){
         throw new NotFoundException('Área no encontrada');
-    } 
-    const newAreaName = await this.areaRepository.findOneBy({ name: updateDto.name });
+    }
+    
+    const newAreaName = await this.areaRepository.findOneBy({ name: updateArea.name });
 
     if(newAreaName) {
       throw new BadRequestException('Ya existe un área con ese nombre');

@@ -50,11 +50,14 @@ export class RolesService {
             throw new NotFoundException('El rol no existe en el sistema');
         }
 
-        const existingRoleName = await this.roleRepository.findOneBy({name: updateRole.name});
+        if(updateRole.name){
+            const existingRoleName = await this.roleRepository.findOneBy({name: updateRole.name});
 
-        if(existingRoleName){
-            throw new BadRequestException('El nombre del rol ya existe en el sistema');
+            if(existingRoleName){
+                throw new BadRequestException('El nombre del rol ya existe en el sistema');
+            }
         }
+    
         
         const savedRole = await this.roleRepository.save(existingRole);
         return plainToInstance(UpdateRoleResposeDto, savedRole, {excludeExtraneousValues: true})
