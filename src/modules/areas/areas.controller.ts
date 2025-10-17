@@ -29,7 +29,7 @@ export class AreasController {
   }
 
   @Post()
-  async create(@Body() createArea: CreateAreaDto): Promise<BaseApplicationResponseDto<AreaResponseDto>> {
+  async createArea(@Body() createArea: CreateAreaDto): Promise<BaseApplicationResponseDto<AreaResponseDto>> {
     const newArea = await this.areasService.createArea(createArea);
         return{
             statusCode: 201, 
@@ -39,7 +39,7 @@ export class AreasController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateArea: CreateAreaDto): Promise<BaseApplicationResponseDto<AreaResponseDto>> {
+  async updateArea(@Param('id') id: string, @Body() updateArea: CreateAreaDto): Promise<BaseApplicationResponseDto<AreaResponseDto>> {
     const updatedArea =  await this.areasService.updateArea(+id, updateArea);
     return{
             statusCode: 202, 
@@ -49,7 +49,7 @@ export class AreasController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<BaseApplicationResponseDto<AreaResponseDto>> {
+  async deleteArea(@Param('id') id: string): Promise<BaseApplicationResponseDto<AreaResponseDto>> {
     const deletedArea = await  this.areasService.deleteArea(+id);
     return{
             statusCode: 202, 
