@@ -1,5 +1,6 @@
 import { Area } from "src/modules/areas/entities/area.entity";
 import { Employee } from "src/modules/employees/entities/employee.entity";
+import { Flow } from "src/modules/flows/entities/flow.entity";
 import { Column, Entity, Generated, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, Unique } from "typeorm";
 
 @Entity('ROLES')
@@ -25,4 +26,7 @@ export class Role{
 
     @OneToMany(()=> Employee, emp => emp.role)
     employees: Employee[];
+
+    @OneToMany(() => Flow, (flow) => flow.role)
+    flows: Flow[];
 }

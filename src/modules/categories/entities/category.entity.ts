@@ -1,4 +1,5 @@
-  import { Column, Entity, Generated, PrimaryColumn } from 'typeorm';  
+  import { Flow } from 'src/modules/flows/entities/flow.entity';
+import { Column, Entity, Generated, OneToMany, PrimaryColumn } from 'typeorm';  
 @Entity('CATEGORY')
 export class Category {
 
@@ -11,4 +12,7 @@ export class Category {
 
   @Column({ name: 'DESCRIPTION', type: 'varchar2',  length: 100,  nullable: true })
   description: string;
+
+  @OneToMany(() => Flow, (flow) => flow.category)
+  flows: Flow[];
 }
