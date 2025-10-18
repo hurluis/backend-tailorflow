@@ -9,6 +9,7 @@ import { AreasModule } from './modules/areas/areas.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { FlowsModule } from './modules/flows/flows.module';
 import { CustomersModule } from './modules/customers/customers.module';
+import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [RolesModule, 
@@ -33,6 +34,7 @@ import { CustomersModule } from './modules/customers/customers.module';
     CategoriesModule,
     FlowsModule,
     CustomersModule,
+    OrdersModule,
    ],
   controllers: [AppController],
   providers: [AppService],
