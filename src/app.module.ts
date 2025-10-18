@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmployeesModule } from './modules/employees/employees.module';
 import { AreasModule } from './modules/areas/areas.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { FlowsModule } from './modules/flows/flows.module';
 
 @Module({
   imports: [RolesModule, 
@@ -29,6 +30,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
     EmployeesModule,
     AreasModule,
     CategoriesModule,
+    FlowsModule,
    ],
   controllers: [AppController],
   providers: [AppService],
