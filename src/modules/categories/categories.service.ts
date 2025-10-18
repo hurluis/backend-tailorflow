@@ -21,7 +21,7 @@ export class CategoriesService {
       throw new NotFoundException('Aún no hay categorías registradas');
     }
 
-    return categories.map((cat) => plainToInstance(CategoryResponseDto, cat, { excludeExtraneousValues: true }));
+    return categories.map(cat => plainToInstance(CategoryResponseDto, cat, { excludeExtraneousValues: true }));
   }
 
   async findById(id: number): Promise<CategoryResponseDto> {
