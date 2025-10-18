@@ -8,6 +8,7 @@ import { EmployeesModule } from './modules/employees/employees.module';
 import { AreasModule } from './modules/areas/areas.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { FlowsModule } from './modules/flows/flows.module';
+import { CustomersModule } from './modules/customers/customers.module';
 
 @Module({
   imports: [RolesModule, 
@@ -31,6 +32,7 @@ import { FlowsModule } from './modules/flows/flows.module';
     AreasModule,
     CategoriesModule,
     FlowsModule,
+    CustomersModule,
    ],
   controllers: [AppController],
   providers: [AppService],
