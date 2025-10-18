@@ -38,6 +38,19 @@ export class FlowsService {
     }
 
     async createFlow(createFlow: CreateFlowDto): Promise<FlowResponseDto> {
+
+        const existingRole = await this.roleService.findById(createFlow.id_role);
+
+        if (!existingRole) {
+            throw new NotFoundException('El rol ingresado no existe');
+        }
+
+        const existingCateory = await this.categoriesService.findById(createFlow.id_category);
+
+        if (!existingCateory) {
+            throw new NotFoundException('La categoría ingresada no existe');
+        }
+
         const duplicateRole = await this.flowRepository.findOne({
             where: { id_category: createFlow.id_category, id_role: createFlow.id_role },
         });
@@ -58,21 +71,10 @@ export class FlowsService {
             );
         }
 
-        const existingRole = await this.roleService.findById(createFlow.id_role);
-
-        if (!existingRole) {
-            throw new NotFoundException('El rol ingresado no existe');
-        }
-
-        const existingCateory = await this.categoriesService.findById(createFlow.id_category);
-
-        if (!existingCateory) {
-            throw new NotFoundException('La categoría ingresada no existe');
-        }
 
         const newFlow = this.flowRepository.create(createFlow);
         const savedFlow = await this.flowRepository.save(newFlow);
-        return plainToInstance(FlowResponseDto, savedFlow, { excludeExtraneousValues: true })
+        return plainToInstance(FlowResponseDto, savedFlow)
     }
 
     async updateFlow(id: number, updateFlow: UpdateFlowDto): Promise<FlowResponseDto> {
@@ -117,16 +119,8 @@ export class FlowsService {
 }
 
 
-    async deleteFlow(id: number): Promise<FlowResponseDto> {
-        const flow = await this.flowRepository.findOne({where: { id_flow: id },relations: ['role', 'category'],});
-
-        if (!flow) {
-            throw new NotFoundException('El  flujo no existe');
-        }
-
-        await this.flowRepository.remove(flow);
-        return plainToInstance(FlowResponseDto, flow, {excludeExtraneousValues: true});
-
+    async deleteFlow(): Promise<void> {
+        throw new BadRequestException('Los flujos no pueden eliminarse una vez creados');
     }
 
 
