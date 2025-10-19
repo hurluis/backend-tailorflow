@@ -25,6 +25,7 @@ import { OrdersModule } from './modules/orders/orders.module';
       password: configService.get<string>('DB_PASSWORD'),
       serviceName: configService.get<string>('SERVICE_NAME'),
       schema: configService.get<string>('DB_SCHEMA'),
+      timezone: 'local',
       entities: [__dirname + '/**/*.entity{.ts,.js}'], 
       synchronize: false,
     })

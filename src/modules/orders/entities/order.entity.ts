@@ -9,13 +9,13 @@ export class Order {
     @Generated('increment')
     id_order: number;
 
-    @Column({ name: 'ID_STATE', type: 'number', nullable: false })
+    @Column({ name: 'ID_STATE', type: 'number', nullable: false, default: 1})
     id_state: number;
 
     @Column({ name: 'ID_CUSTOMER', type: 'number', nullable: false })
     id_customer: number;
 
-    @CreateDateColumn({name: 'ENTRY_DATE',type: 'timestamp',default: () => 'SYSDATE'})
+    @CreateDateColumn({name: 'ENTRY_DATE', type: 'timestamp',default: () => 'SYSDATE'})
     entry_date: Date;
 
     @Column({name: 'ESTIMATED_DELIVERY_DATE',type: 'timestamp',nullable: true})

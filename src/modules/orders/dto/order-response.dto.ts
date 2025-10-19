@@ -5,16 +5,16 @@ export class OrderResponseDto {
   id_order: number;
 
   @Expose()
-  state_name?: string;
+  state_name: string;
 
   @Expose()
-  customer_name?: string;
+  customer_name: string;
 
   @Expose()
-  @Transform(({ value }) => value ? value.toISOString().split('T')[0] : null)
+  @Transform(({ value }) => value ? new Date(value).toISOString().split('T')[0] : null)
   entry_date: string;
 
   @Expose()
-  @Transform(({ value }) => value ? value.toISOString().split('T')[0] : null)
+  @Transform(({ value }) => value ? new Date(value).toISOString().split('T')[0] : null)
   estimated_delivery_date?: string;
 }

@@ -3,10 +3,6 @@ import { IsInt, IsOptional, IsDate, IsPositive } from 'class-validator';
 
 export class CreateOrderDto {
 
-  @IsInt({ message: 'El campo id_state debe ser un número entero.' })
-  @IsPositive({ message: 'El campo id_state debe ser un número positivo.' })
-  id_state: number;
-
   @IsInt({ message: 'El campo id_customer debe ser un número entero.' })
   @IsPositive({ message: 'El campo id_customer debe ser un número positivo.' })
   id_customer: number;
