@@ -1,4 +1,5 @@
 import { Order } from "src/modules/orders/entities/order.entity";
+import { Product } from "src/modules/product/entities/product.entity";
 import { Column, Entity, Generated, OneToMany, PrimaryColumn, Unique } from "typeorm";
 
 export enum StateName {
@@ -20,4 +21,7 @@ export class State {
 
     @OneToMany(() => Order, (order) => order.state)
     orders: Order[];
+
+    @OneToMany(() => Product, (product) => product.state)
+    products: Product[];
 }
