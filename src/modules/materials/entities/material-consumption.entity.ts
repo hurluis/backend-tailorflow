@@ -11,9 +11,8 @@ export class MaterialConsumption{
     @Column({ name: 'ID_MATERIAL', type: 'number', precision: 10 })
     id_material: number;
 
-    /*
     @Column({ name: 'ID_TASK', type: 'number', precision: 10 })
-    id_task: number;*/
+    id_task: number;
 
     @Column({ name: 'QUANTITY', type: 'number', precision: 10, nullable: false, default: 0 })
     quantity: number;
