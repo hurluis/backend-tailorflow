@@ -91,7 +91,9 @@ export class EmployeesService {
             throw new NotFoundException('El trabajador no existe')
         }
 
-        await this.employeeRepository.remove(existingEmployee);
+        
+        existingEmployee.state = States.INACTIVE;
+        await this.employeeRepository.save(existingEmployee);
         return plainToInstance(EmployeeResponseDto, existingEmployee, {excludeExtraneousValues: true})
     }
 

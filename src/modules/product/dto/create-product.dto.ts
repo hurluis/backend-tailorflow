@@ -10,10 +10,6 @@ export class CreateProductDto {
   @IsPositive({ message: 'El campo id_category debe ser un número positivo.' })
   id_category: number;
 
-  @IsInt({ message: 'El campo id_state debe ser un número entero.' })
-  @IsPositive({ message: 'El campo id_state debe ser un número positivo.' })
-  id_state: number;
-
   @IsString({ message: 'El campo name debe ser una cadena de texto.' })
   @IsNotEmpty({ message: 'El campo name es obligatorio.' })
   @MaxLength(100, { message: 'El campo name no puede tener más de 100 caracteres.' })
@@ -34,7 +30,7 @@ export class CreateProductDto {
   @MaxLength(100, { message: 'El campo dimensions no puede tener más de 100 caracteres.' })
   dimensions?: string;
 
-
+  @IsNotEmpty({ message: 'El campo tela es obligatorio.' })
   @IsString({ message: 'El campo fabric debe ser una cadena de texto.' })
   @MaxLength(100, { message: 'El campo fabric no puede tener más de 100 caracteres.' })
   fabric: string;
