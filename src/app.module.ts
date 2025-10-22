@@ -10,7 +10,8 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { FlowsModule } from './modules/flows/flows.module';
 import { CustomersModule } from './modules/customers/customers.module';
 import { OrdersModule } from './modules/orders/orders.module';
-import { ProductModule } from './modules/product/product.module';
+import { MaterialsModule } from './modules/materials/materials.module';
+import { ProductsModule } from './modules/products/products.module';
 
 @Module({
   imports: [RolesModule, 
@@ -38,7 +39,8 @@ import { ProductModule } from './modules/product/product.module';
     FlowsModule,
     CustomersModule,
     OrdersModule,
-    ProductModule,
+    ProductsModule,
+    MaterialsModule,
    ],
   controllers: [AppController],
   providers: [AppService],

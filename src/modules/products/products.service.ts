@@ -10,7 +10,7 @@ import { CategoriesService } from '../categories/categories.service';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
-export class ProductService {
+export class ProductsService {
     constructor(
         @InjectRepository(Product) private productRepository: Repository<Product>,
         private readonly ordersService: OrdersService,

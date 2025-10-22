@@ -1,13 +1,13 @@
 import { Controller, Get, Param, Post, Body, Delete, Patch } from '@nestjs/common';
-import { ProductService } from './product.service';
+import { ProductsService } from './products.service';
 import { BaseApplicationResponseDto } from 'src/common/dto/base-application-response.dto';
 import { ProductResponseDto } from './dto/product-response.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
-export class ProductController {
-    constructor(private productsService: ProductService){}
+export class ProductsController {
+    constructor(private productsService: ProductsService){}
 
     @Get()
     async findAll(): Promise<BaseApplicationResponseDto<ProductResponseDto[]>>{
