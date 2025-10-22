@@ -10,12 +10,14 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { FlowsModule } from './modules/flows/flows.module';
 import { CustomersModule } from './modules/customers/customers.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { ProductModule } from './modules/product/product.module';
 
 @Module({
   imports: [RolesModule, 
     ConfigModule.forRoot({isGlobal: true}),
     TypeOrmModule.forRootAsync({
     imports: [ConfigModule],
+    
     inject: [ConfigService],
     useFactory: (configService : ConfigService) => ({
       type: 'oracle',
@@ -36,6 +38,7 @@ import { OrdersModule } from './modules/orders/orders.module';
     FlowsModule,
     CustomersModule,
     OrdersModule,
+    ProductModule,
    ],
   controllers: [AppController],
   providers: [AppService],
