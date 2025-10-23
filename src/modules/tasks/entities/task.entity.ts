@@ -21,7 +21,7 @@ export class Task {
     @Column({ name: 'ID_AREA', type: 'number',  nullable: false })
     id_area: number;
 
-    @Column({ name: 'ID_STATE', type: 'number', nullable: false })
+    @Column({ name: 'ID_STATE', type: 'number', nullable: false, default: 1 })
     id_state: number;
 
     @Column({ name: 'SEQUENCE', type: 'number', nullable: false })

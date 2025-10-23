@@ -123,5 +123,7 @@ export class FlowsService {
         throw new BadRequestException('Los flujos no pueden eliminarse una vez creados');
     }
 
-
+    async findByCategoryOrderBySequence(idCategory: number): Promise<Flow[]>{
+        return await this.flowRepository.find({where: {id_category: idCategory}, relations: ['role', 'role.area'], order: {sequence: 'ASC'}})
+    }
 }

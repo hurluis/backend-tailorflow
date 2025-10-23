@@ -9,6 +9,7 @@ import { RolesModule } from '../roles/roles.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Flow]), CategoriesModule, RolesModule],
   providers: [FlowsService],
-  controllers: [FlowsController]
+  controllers: [FlowsController],
+  exports: [FlowsService]
 })
 export class FlowsModule {}

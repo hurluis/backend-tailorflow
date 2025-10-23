@@ -8,76 +8,92 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { OrdersService } from '../orders/orders.service';
 import { CategoriesService } from '../categories/categories.service';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { FlowsService } from '../flows/flows.service';
+import { TasksService } from '../tasks/tasks.service';
 
 @Injectable()
 export class ProductsService {
     constructor(
         @InjectRepository(Product) private productRepository: Repository<Product>,
         private readonly ordersService: OrdersService,
-        private readonly categoriesService: CategoriesService
-    ){}
+        private readonly categoriesService: CategoriesService,
+        private readonly flowsService: FlowsService,
+        private readonly tasksService: TasksService
+    ) { }
 
-    async findAll(): Promise<ProductResponseDto[]>{
+    async findAll(): Promise<ProductResponseDto[]> {
         const products = await this.productRepository.find();
 
-        if(!products || products.length === 0){
+        if (!products || products.length === 0) {
             throw new NotFoundException('No hay productos');
         }
-        return products.map(product => plainToInstance(ProductResponseDto, product, {excludeExtraneousValues: true}))
+        return products.map(product => plainToInstance(ProductResponseDto, product, { excludeExtraneousValues: true }))
     }
 
-    async findById(id:number): Promise<ProductResponseDto>{
-        const product = await this.productRepository.findOne({where: {id_product: id}, relations: ['order', 'category', 'state']});
+    async findById(id: number): Promise<ProductResponseDto> {
+        const product = await this.productRepository.findOne({ where: { id_product: id }, relations: ['order', 'category', 'state'] });
 
-        if(!product){
+        if (!product) {
             throw new NotFoundException('Producto no existe');
         }
 
-        return plainToInstance(ProductResponseDto, product, {excludeExtraneousValues: true});
+        return plainToInstance(ProductResponseDto, product, { excludeExtraneousValues: true });
     }
 
-    async createProduct(createProduct: CreateProductDto): Promise<ProductResponseDto>{
+    async createProduct(createProduct: CreateProductDto): Promise<ProductResponseDto> {
         await this.ordersService.findById(createProduct.id_order);
-       
-        await this.categoriesService.findById(createProduct.id_category)
 
-       const newProduct = this.productRepository.create(createProduct);
-       newProduct.id_state = 1;
-       const savedProduct = await this.productRepository.save(newProduct);
+        const category = await this.categoriesService.findById(createProduct.id_category)
 
-       return plainToInstance(ProductResponseDto, savedProduct, {excludeExtraneousValues: true})
-        
+        const newProduct = this.productRepository.create({ ...createProduct, id_state: 1 });
+        const savedProduct = await this.productRepository.save(newProduct);
+
+        const flows = await this.flowsService.findByCategoryOrderBySequence(savedProduct.id_category);
+
+        if (!flows || flows.length === 0) {
+            throw new BadRequestException(
+                `No hay flujos configurados para la categoría ${category.name}`
+            );
+        }
+
+        for(const flow of flows){
+            await this.tasksService.createTask({id_product: savedProduct.id_product, id_area: flow.role.id_area, sequence: flow.sequence, id_state: 1});
+        }
+
+        const productRelations = this.productRepository.findOne({where: {id_product: savedProduct.id_product}, relations: ['category', 'state', 'order']}) 
+        return plainToInstance(ProductResponseDto, productRelations, { excludeExtraneousValues: true })
+
     }
 
-    async updateProduct(id: number, updatePoduct: UpdateProductDto): Promise<ProductResponseDto>{
-        const existingProduct = await this.productRepository.preload({id_product: id, ...updatePoduct});
+    async updateProduct(id: number, updatePoduct: UpdateProductDto): Promise<ProductResponseDto> {
+        const existingProduct = await this.productRepository.preload({ id_product: id, ...updatePoduct });
 
-        if(!existingProduct){
+        if (!existingProduct) {
             throw new NotFoundException('El producto no existe')
         }
 
-        if(existingProduct.id_state != 1){
+        if (existingProduct.id_state != 1) {
             throw new BadRequestException('El producto ya se encuentra en producción, no puedes cambiarlo');
         }
 
         const savedProduct = this.productRepository.save(existingProduct);
-        return plainToInstance(ProductResponseDto, savedProduct, {excludeExtraneousValues: true})
+        return plainToInstance(ProductResponseDto, savedProduct, { excludeExtraneousValues: true })
 
     }
 
-    async deleteProduct(id: number){
-        const existingProduct = await this.productRepository.findOneBy({id_product: id});
+    async deleteProduct(id: number) {
+        const existingProduct = await this.productRepository.findOneBy({ id_product: id });
 
-        if(!existingProduct){
+        if (!existingProduct) {
             throw new NotFoundException('El producto no existe')
         }
 
-        if(existingProduct.id_state != 1){
+        if (existingProduct.id_state != 1) {
             throw new BadRequestException('El producto ya se encuentra en producción, no puedes eliminarlo');
         }
 
         const deletedProduct = await this.productRepository.remove(existingProduct);
-        return plainToInstance(ProductResponseDto, deletedProduct, {excludeExtraneousValues: true});
+        return plainToInstance(ProductResponseDto, deletedProduct, { excludeExtraneousValues: true });
     }
-       
+
 }
