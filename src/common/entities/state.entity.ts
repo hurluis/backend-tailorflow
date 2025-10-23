@@ -1,5 +1,6 @@
 import { Order } from "src/modules/orders/entities/order.entity";
 import { Product } from "src/modules/products/entities/product.entity";
+import { Task } from "src/modules/tasks/entities/task.entity";
 import { Column, Entity, Generated, OneToMany, PrimaryColumn, Unique } from "typeorm";
 
 export enum StateName {
@@ -24,4 +25,7 @@ export class State {
 
     @OneToMany(() => Product, (product) => product.state)
     products: Product[];
+
+    @OneToMany(() => Task, task => task.state)
+    tasks: Task[];
 }

@@ -1,5 +1,6 @@
 import { Role } from "src/modules/roles/entities/role.entity";
-import { Column, Entity, JoinColumn, ManyToOne, Check, PrimaryColumn, Generated } from "typeorm";
+import { Task } from "src/modules/tasks/entities/task.entity";
+import { Column, Entity, JoinColumn, ManyToOne, Check, PrimaryColumn, Generated, OneToMany } from "typeorm";
 
 export enum States {
   ACTIVE = 'ACTIVE',
@@ -32,4 +33,7 @@ export class Employee {
   @ManyToOne(() => Role, role => role.employees, { nullable: false })
   @JoinColumn({ name: 'ID_ROLE' })
   role: Role;
+
+  @OneToMany(() => Task, task => task.employee)
+  tasks: Task[];
 }

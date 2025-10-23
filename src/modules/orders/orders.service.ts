@@ -27,13 +27,13 @@ export class OrdersService {
     }
 
     async findById(id: number): Promise<OrderResponseDto> {
-        const order = await this.orderRepository.findOne({ where: { id_order: id }, relations: ['state', 'customer'], });
+        const order = await this.orderRepository.findOne({ where: { id_order: id }, relations: ['state', 'customer', 'products'], });
 
         if (!order) {
             throw new NotFoundException(`No se encontró la orden con ID ${id}`);
         }
 
-        return plainToInstance(OrderResponseDto, { ...order, state_name: order.state.name, customer_name: order.customer.name }, {excludeExtraneousValues: true});
+        return plainToInstance(OrderResponseDto, { ...order, state_name: order.state.name, customer_name: order.customer.name, products: order.products }, {excludeExtraneousValues: true});
     }
 
     async createOrder(order: CreateOrderDto): Promise<OrderResponseDto> {
@@ -43,6 +43,7 @@ export class OrdersService {
         if (order.estimated_delivery_date && new Date(order.estimated_delivery_date) < new Date()) {
             throw new BadRequestException('La fecha estimada no puede ser menor que la fecha actual.');
         }
+        
         const newOrder = this.orderRepository.create({ ...order, id_state: 1, });
 
         const savedOrder = await this.orderRepository.save(newOrder);
