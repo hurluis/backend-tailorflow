@@ -10,6 +10,7 @@ import { CategoriesService } from '../categories/categories.service';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FlowsService } from '../flows/flows.service';
 import { TasksService } from '../tasks/tasks.service';
+import { EmployeesService } from '../employees/employees.service';
 
 @Injectable()
 export class ProductsService {
@@ -18,7 +19,8 @@ export class ProductsService {
         private readonly ordersService: OrdersService,
         private readonly categoriesService: CategoriesService,
         private readonly flowsService: FlowsService,
-        private readonly tasksService: TasksService
+        private readonly tasksService: TasksService,
+        private readonly employeesService: EmployeesService
     ) { }
 
     async findAll(): Promise<ProductResponseDto[]> {
@@ -57,7 +59,15 @@ export class ProductsService {
         }
 
         for(const flow of flows){
-            await this.tasksService.createTask({id_product: savedProduct.id_product, id_area: flow.role.id_area, sequence: flow.sequence, id_state: 1});
+            const task = await this.tasksService.createTask({
+                id_product: savedProduct.id_product, 
+                id_area: flow.role.id_area, sequence: 
+                flow.sequence, 
+                id_state: 1});
+
+            const employee = await this.employeesService.findEmployeeWithLeastWorkload(flow.id_role);
+            await this.tasksService.assignEmployee(task.id_task, employee.id_employee);
+
         }
 
         const productRelations = this.productRepository.findOne({where: {id_product: savedProduct.id_product}, relations: ['category', 'state', 'order']}) 

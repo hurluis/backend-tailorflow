@@ -7,9 +7,10 @@ import { OrdersModule } from '../orders/orders.module';
 import { CategoriesModule } from '../categories/categories.module';
 import { FlowsModule } from '../flows/flows.module';
 import { TasksModule } from '../tasks/tasks.module';
+import { EmployeesModule } from '../employees/employees.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product]), OrdersModule, CategoriesModule, FlowsModule, TasksModule],
+  imports: [TypeOrmModule.forFeature([Product]), OrdersModule, CategoriesModule, FlowsModule, TasksModule, EmployeesModule],
   controllers: [ProductsController],
   providers: [ProductsService],
   exports: [ProductsService]

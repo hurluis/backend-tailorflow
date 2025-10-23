@@ -1,5 +1,6 @@
 import { Expose, Type } from "class-transformer";
 import { RoleResponseDto } from "src/modules/roles/dto/role-response.dto";
+import { TaskResponseDto } from "src/modules/tasks/dto/task-response.dto";
 
 export class EmployeeResponseDto{
 
@@ -18,5 +19,9 @@ export class EmployeeResponseDto{
     @Expose()
     @Type(() => RoleResponseDto) 
     role: RoleResponseDto;
+
+    @Expose()
+    @Type(() => TaskResponseDto)
+    tasks: TaskResponseDto[]
 
 }

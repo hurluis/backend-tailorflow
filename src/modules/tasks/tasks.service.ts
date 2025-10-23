@@ -34,14 +34,33 @@ export class TasksService {
     }
 
     async createTask(taskData: { id_product: number, id_area: number; sequence: number; id_state: number; }): Promise<Task> {
-        
+
         const existingTask = await this.taskRepository.findOne({ where: { id_product: taskData.id_product, sequence: taskData.sequence } });
         if (existingTask) {
             throw new BadRequestException(
                 `Ya existe una tarea con la secuencia ${taskData.sequence} para este producto`
             );
         }
-        const task = this.taskRepository.create({...taskData});
+        const task = this.taskRepository.create({ ...taskData });
         return await this.taskRepository.save(task)
     }
+
+    async assignEmployee(idTask: number, idEmployee: number): Promise<Task> {
+        const task = await this.taskRepository.findOne({
+            where: { id_task: idTask },
+        });
+
+        if (!task) {
+            throw new NotFoundException(`Tarea con ID ${idTask} no encontrada`);
+        }
+
+        if (task.id_employee) {
+            throw new BadRequestException('La tarea ya tiene un empleado asignado');
+        }
+
+        task.id_employee = idEmployee;
+        return await this.taskRepository.save(task);
+    }
+
+
 }
