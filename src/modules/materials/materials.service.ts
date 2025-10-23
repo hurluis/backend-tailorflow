@@ -9,13 +9,16 @@ import { CreateMaterialDto } from './dto/material/create-material.dto';
 import { AreasService } from '../areas/areas.service';
 import { UpdateMaterialDto } from './dto/material/update-material.dto';
 import { MaterialConsumptionResponseDto } from './dto/material-consumption/material-consumption-response.dto';
+import { TasksService } from '../tasks/tasks.service';
+import { CreateMaterialConsumptionDto } from './dto/material-consumption/create-material-consumption.dto';
 
 @Injectable()
 export class MaterialsService {
     constructor(
         @InjectRepository(Material) private materialRepository: Repository<Material>,
         @InjectRepository(MaterialConsumption) private materialConsumptionRepository: Repository<MaterialConsumption>,
-        private readonly areasService: AreasService
+        private readonly areasService: AreasService,
+        private readonly tasksService: TasksService
     ){}
 
     async findAllMaterials(): Promise<MaterialResponseDto[]>{
@@ -64,7 +67,6 @@ export class MaterialsService {
         const savedMaterial = await this.materialRepository.save(createdMaterial);
         return plainToInstance(MaterialResponseDto, savedMaterial, {excludeExtraneousValues:true})
 
-
     }
 
     async updateMaterial(id: number, material: UpdateMaterialDto): Promise<MaterialResponseDto>{
@@ -99,6 +101,29 @@ export class MaterialsService {
         return plainToInstance(MaterialResponseDto, deletedMaterial, {excludeExtraneousValues:true});
     }
 
+    async adjustStock(id: number, quantity: number, operation: 'add' | 'subtract'): Promise<MaterialResponseDto>{
+        const material = await this.materialRepository.findOne({where: {id_material: id}});
+
+        if(!material){
+            throw new NotFoundException(`Material con id ${id} no encontrado`);
+        }
+
+        if(operation === 'add'){
+            material.current_stock += quantity;
+        } else {
+            if(material.current_stock < quantity){
+                 throw new BadRequestException(
+                    `Stock insuficiente del material '${material.name}'. ` +
+                    `Stock actual: ${material.current_stock}, Se requiere: ${quantity}`
+                );
+            }
+            material.current_stock -= quantity;
+        }
+
+        const savedMaterial = await this.materialRepository.save(material);
+        return plainToInstance(MaterialResponseDto, savedMaterial, { excludeExtraneousValues: true });
+    }
+
     async finAllConsumptions(): Promise<MaterialConsumptionResponseDto[]>{
         const consumptions = await this.materialConsumptionRepository.find({relations: ['material', 'material.area']});
 
@@ -109,8 +134,18 @@ export class MaterialsService {
         return consumptions.map(cons => plainToInstance(MaterialConsumptionResponseDto, cons, {excludeExtraneousValues:true}));
     }
 
+    async findConsumptionById(id: number): Promise<MaterialConsumptionResponseDto> {
+        const consumption = await this.materialConsumptionRepository.findOne({ where: { id_consumption: id },relations: ['material', 'material.area', 'task', 'task.area']});
+
+        if (!consumption) {
+            throw new NotFoundException(`Consumo con ID ${id} no encontrado`);
+        }
+
+        return plainToInstance(MaterialConsumptionResponseDto, consumption, { excludeExtraneousValues: true });
+    }
+
     async findConsumptionByMaterial(idMaterial: number): Promise<MaterialConsumptionResponseDto[]>{
-        
+
         await this.findMaterialById(idMaterial);
 
         const consumptions = await this.materialConsumptionRepository.find({where: {id_material: idMaterial}, relations: ['material']});
@@ -123,7 +158,8 @@ export class MaterialsService {
     }
 
     async findConsumptionsByTask(idTask: number): Promise<MaterialConsumptionResponseDto[]>{
-        const consumptions = await this.materialConsumptionRepository.find({where: { id_task: idTask }, relations: ['material', 'material.area']});
+        await this.tasksService.findById(idTask)
+        const consumptions = await this.materialConsumptionRepository.find({where: { id_task: idTask }, relations: ['material', 'material.area', 'task']});
         
         if(!consumptions || consumptions.length === 0){
             throw new NotFoundException('No existen consumos para esta tarea');
@@ -132,9 +168,38 @@ export class MaterialsService {
         return consumptions.map(cons => plainToInstance(MaterialConsumptionResponseDto, cons, {excludeExtraneousValues:true}));
     }
 
-    //create se hace cuando tengamos Task
-    //Update se hace cuando tengamos Task
-    //delete se hace cuando tengamos task
+    async createMaterialConsumption(newConsumption: CreateMaterialConsumptionDto): Promise<MaterialConsumptionResponseDto>{
+        const task = await this.tasksService.findByIdRelations(newConsumption.id_task);
+
+        const material = await this.materialRepository.findOne({where: {id_material: newConsumption.id_material}, relations: ['area']});
+
+        if(!material){
+            throw new NotFoundException(`Material con id ${newConsumption.id_material} no encontrado`);
+        }
+
+        if(material.id_area != task.id_area){
+            throw new BadRequestException(
+                `El material '${material.name}' pertenece al área '${material.area.name}' ` +
+                `pero la tarea pertenece al área '${task.area.name}'. ` +
+                `No se puede registrar el consumo.`
+            );
+        }
+
+        if(material.current_stock < newConsumption.quantity){
+            throw new BadRequestException(
+                `Stock insuficiente del material '${material.name}'. ` +
+                `Stock actual: ${material.current_stock}, Se requiere: ${newConsumption.quantity}`
+            );
+        }
+
+        const consumption = this.materialConsumptionRepository.create(newConsumption);
+        const savedConsumption = await this.materialConsumptionRepository.save(consumption);
+
+        await this.adjustStock(material.id_material, newConsumption.quantity, 'subtract');
+
+        const consumptionWithRelations = await this.materialConsumptionRepository.findOne({where: { id_consumption: savedConsumption.id_consumption },relations: ['material', 'material.area', 'task']});
+        return plainToInstance(MaterialConsumptionResponseDto, consumptionWithRelations, { excludeExtraneousValues: true });
+    }
 
 
 }

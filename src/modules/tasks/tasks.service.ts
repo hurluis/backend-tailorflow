@@ -6,6 +6,7 @@ import { TaskResponseDto } from './dto/task-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { ProductsService } from '../products/products.service';
 import { AreasService } from '../areas/areas.service';
+import { StartTaskDto } from './dto/start-task.dto';
 
 @Injectable()
 export class TasksService {
@@ -31,6 +32,16 @@ export class TasksService {
             throw new NotFoundException('Tarea no encontrada');
         }
         return plainToInstance(TaskResponseDto, task, { excludeExtraneousValues: true })
+    }
+
+    async findByIdRelations(idTask: number): Promise <Task>{
+        const task = await this.taskRepository.findOne({where: {id_task: idTask}, relations: ['area', 'product']});
+
+        if(!task){
+            throw new NotFoundException(`Tarea con ID ${idTask} no encontrada`);
+        }
+
+        return task
     }
 
     async createTask(taskData: { id_product: number, id_area: number; sequence: number; id_state: number; }): Promise<Task> {
