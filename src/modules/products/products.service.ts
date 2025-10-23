@@ -37,16 +37,9 @@ export class ProductsService {
     }
 
     async createProduct(createProduct: CreateProductDto): Promise<ProductResponseDto>{
-        const existingOrder = await this.ordersService.findById(createProduct.id_order);
-        if(!existingOrder) {
-            throw new NotFoundException('La orden indicada no existe');
-        }
-
-        const existingCategory = await this.categoriesService.findById(createProduct.id_category)
-        
-        if(!existingCategory){
-            throw new NotFoundException('La categoría indicada no existe');
-        }
+        await this.ordersService.findById(createProduct.id_order);
+       
+        await this.categoriesService.findById(createProduct.id_category)
 
        const newProduct = this.productRepository.create(createProduct);
        newProduct.id_state = 1;

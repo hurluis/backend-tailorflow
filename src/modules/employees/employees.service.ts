@@ -55,11 +55,6 @@ export class EmployeesService {
         }
 
         const existingRole = await this.rolesService.findById(createEmployee.id_role);
-
-        if(!existingRole){
-            throw new NotFoundException('El rol no exite')
-        }
-
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(createEmployee.password, saltRounds);
         const newEmployee = this.employeeRepository.create({...createEmployee, password: hashedPassword, state: States.ACTIVE, role: existingRole});
