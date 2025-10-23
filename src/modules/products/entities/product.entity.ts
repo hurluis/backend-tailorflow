@@ -1,7 +1,8 @@
-import { Entity, PrimaryColumn, Generated, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Generated, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Order } from 'src/modules/orders/entities/order.entity';
 import { Category } from 'src/modules/categories/entities/category.entity';
 import { State } from 'src/common/entities/state.entity';
+import { Task } from 'src/modules/tasks/entities/task.entity';
 
 @Entity('PRODUCTS')
 export class Product {
@@ -48,4 +49,7 @@ export class Product {
   @ManyToOne(() => State, (state) => state.id_state)
   @JoinColumn({ name: 'ID_STATE' })
   state: State;
+
+  @OneToMany(() => Task, task => task.product)
+  tasks: Task[];
 }

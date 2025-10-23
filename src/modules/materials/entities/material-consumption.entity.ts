@@ -1,5 +1,6 @@
 import { Column, Entity, Generated, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { Material } from "./material.entity";
+import { Task } from "src/modules/tasks/entities/task.entity";
 
 @Entity('MATERIAL_CONSUMPTION')
 export class MaterialConsumption{
@@ -21,8 +22,7 @@ export class MaterialConsumption{
     @JoinColumn({ name: 'ID_MATERIAL' }) 
     material: Material;
 
-    /*
     @ManyToOne(() => Task, task => task.materialConsumptions)
-    @JoinColumn({ name: 'ID_TASK' }) // Especifica la columna FK
-    task: Task;*/
+    @JoinColumn({ name: 'ID_TASK' })
+    task: Task;
 }
