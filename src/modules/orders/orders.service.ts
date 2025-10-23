@@ -38,11 +38,7 @@ export class OrdersService {
 
     async createOrder(order: CreateOrderDto): Promise<OrderResponseDto> {
 
-        const existingUser = await this.customersService.findById(order.id_customer);
-
-        if (!existingUser) {
-            throw new NotFoundException('El cliente indicado no existe')
-        }
+        await this.customersService.findById(order.id_customer);
 
         if (order.estimated_delivery_date && new Date(order.estimated_delivery_date) < new Date()) {
             throw new BadRequestException('La fecha estimada no puede ser menor que la fecha actual.');

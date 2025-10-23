@@ -1,5 +1,6 @@
 import { Entity, PrimaryColumn, Column, OneToMany, Generated } from 'typeorm';
 import { Role } from 'src/modules/roles/entities/role.entity';
+import { Material } from 'src/modules/materials/entities/material.entity';
 
 @Entity('AREAS')
 export class Area {
@@ -13,4 +14,7 @@ export class Area {
     
     @OneToMany(() => Role, role => role.area)
     roles: Role[];
+
+    @OneToMany(() => Material, material => material.area)
+    materials: Material[];
 }

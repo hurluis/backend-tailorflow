@@ -10,7 +10,7 @@ import { CategoriesService } from '../categories/categories.service';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
-export class ProductService {
+export class ProductsService {
     constructor(
         @InjectRepository(Product) private productRepository: Repository<Product>,
         private readonly ordersService: OrdersService,
@@ -37,16 +37,9 @@ export class ProductService {
     }
 
     async createProduct(createProduct: CreateProductDto): Promise<ProductResponseDto>{
-        const existingOrder = await this.ordersService.findById(createProduct.id_order);
-        if(!existingOrder) {
-            throw new NotFoundException('La orden indicada no existe');
-        }
-
-        const existingCategory = await this.categoriesService.findById(createProduct.id_category)
-        
-        if(!existingCategory){
-            throw new NotFoundException('La categoría indicada no existe');
-        }
+        await this.ordersService.findById(createProduct.id_order);
+       
+        await this.categoriesService.findById(createProduct.id_category)
 
        const newProduct = this.productRepository.create(createProduct);
        newProduct.id_state = 1;

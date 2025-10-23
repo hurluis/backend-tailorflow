@@ -1,5 +1,5 @@
   import { Flow } from 'src/modules/flows/entities/flow.entity';
-import { Product } from 'src/modules/product/entities/product.entity';
+import { Product } from 'src/modules/products/entities/product.entity';
 import { Column, Entity, Generated, OneToMany, PrimaryColumn } from 'typeorm';  
 @Entity('CATEGORY')
 export class Category {
