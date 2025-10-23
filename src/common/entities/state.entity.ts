@@ -1,5 +1,5 @@
 import { Order } from "src/modules/orders/entities/order.entity";
-import { Product } from "src/modules/product/entities/product.entity";
+import { Product } from "src/modules/products/entities/product.entity";
 import { Column, Entity, Generated, OneToMany, PrimaryColumn, Unique } from "typeorm";
 
 export enum StateName {

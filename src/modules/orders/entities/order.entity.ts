@@ -1,6 +1,6 @@
 import { State } from "src/common/entities/state.entity";
 import { Customer } from "src/modules/customers/entities/customer.entity";
-import { Product } from "src/modules/product/entities/product.entity";
+import { Product } from "src/modules/products/entities/product.entity";
 import { Column, CreateDateColumn, Entity, Generated, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 
 @Entity('ORDERS')
