@@ -10,6 +10,7 @@ import { TasksModule } from '../tasks/tasks.module';
 @Module({
   imports:[TypeOrmModule.forFeature([Material, MaterialConsumption]), AreasModule, TasksModule],
   providers: [MaterialsService],
-  controllers: [MaterialsController]
+  controllers: [MaterialsController],
+  exports: [MaterialsService]
 })
 export class MaterialsModule {}

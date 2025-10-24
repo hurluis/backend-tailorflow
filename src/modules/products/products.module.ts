@@ -8,9 +8,10 @@ import { CategoriesModule } from '../categories/categories.module';
 import { FlowsModule } from '../flows/flows.module';
 import { TasksModule } from '../tasks/tasks.module';
 import { EmployeesModule } from '../employees/employees.module';
+import { MaterialsModule } from '../materials/materials.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product]), OrdersModule, CategoriesModule, FlowsModule, TasksModule, EmployeesModule],
+  imports: [TypeOrmModule.forFeature([Product]), OrdersModule, CategoriesModule, FlowsModule, TasksModule, EmployeesModule, MaterialsModule],
   controllers: [ProductsController],
   providers: [ProductsService],
   exports: [ProductsService]
