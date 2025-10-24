@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './entities/task.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { TaskResponseDto } from './dto/task-response.dto';
 import { plainToInstance } from 'class-transformer';
 
@@ -9,7 +9,8 @@ import { plainToInstance } from 'class-transformer';
 export class TasksService {
 
     constructor(
-        @InjectRepository(Task) private taskRepository: Repository<Task>
+        @InjectRepository(Task) private taskRepository: Repository<Task>,
+        private dataSource: DataSource
     ) { }
 
     async findAll(): Promise<TaskResponseDto[]> {
@@ -23,7 +24,7 @@ export class TasksService {
     }
 
     async findById(id: number): Promise<TaskResponseDto> {
-        const task = this.taskRepository.findOne({ where: { id_task: id } });
+        const task = await this.taskRepository.findOne({ where: { id_task: id } });
 
         if (!task) {
             throw new NotFoundException('Tarea no encontrada');
@@ -72,17 +73,99 @@ export class TasksService {
         return await this.taskRepository.save(task);
     }
 
-    private async findPreviousTask(id_product: number, sequence: number): Promise<Task | null> {
-        if (sequence === 1) {
-            return null;
-        }
-        return this.taskRepository.findOne({
-            where: { id_product, sequence: sequence - 1 }
+    async findAssignedTasks(employeeId: number): Promise<TaskResponseDto[]> {
+        const tasks = await this.taskRepository.find({
+            where: { id_employee: employeeId },
+            relations: ['product']
         });
+
+        if (!tasks || tasks.length === 0) {
+            throw new NotFoundException('No tienes tareas asignadas');
+        }
+        return tasks.map(task => plainToInstance(TaskResponseDto, task, { excludeExtraneousValues: true }));
     }
 
+    private async updateCascadingStates(idTask: number): Promise<void> {
+        const task = await this.taskRepository.findOne({
+            where: { id_task: idTask },
+            relations: ['product', 'product.order']
+        });
+
+        if (!task) return;
+
+        const productId = task.id_product;
+        const orderId = task.product.id_order;
+
+        await this.updateProductState(productId);
+        await this.updateOrderState(orderId);
+    }
+
+    private async updateProductState(productId: number): Promise<void> {
+
+        const tasks = await this.taskRepository.find({
+            where: { id_product: productId }
+        });
+
+        if (!tasks || tasks.length === 0) return;
+
+        const allPending = tasks.every(t => t.id_state === 1);
+        const allFinished = tasks.every(t => t.id_state === 3);
+        const someInProgress = tasks.some(t => t.id_state === 2);
+
+        let newState: number;
+
+        if (allFinished) {
+            newState = 3;
+        } else if (someInProgress || tasks.some(t => t.id_state === 3)) {
+            newState = 2;
+        } else {
+            newState = 1;
+        }
+
+
+        await this.dataSource.query(
+            'UPDATE PRODUCTS SET ID_STATE = :state WHERE ID_PRODUCT = :productId',
+            [newState, productId]
+        );
+    }
+
+
+    private async updateOrderState(orderId: number): Promise<void> {
+
+        const products = await this.dataSource.query(
+            'SELECT ID_STATE FROM PRODUCTS WHERE ID_ORDER = :orderId',
+            [orderId]
+        );
+
+        if (!products || products.length === 0) return;
+
+        const allPending = products.every(p => p.ID_STATE === 1);
+        const allFinished = products.every(p => p.ID_STATE === 3);
+        const someInProgress = products.some(p => p.ID_STATE === 2);
+
+        let newState: number;
+
+        if (allFinished) {
+            newState = 3;
+        } else if (someInProgress || products.some(p => p.ID_STATE === 3)) {
+            newState = 2;
+        } else {
+            newState = 1;
+        }
+
+
+        await this.dataSource.query(
+            'UPDATE ORDERS SET ID_STATE = :state WHERE ID_ORDER = :orderId',
+            [newState, orderId]
+        );
+    }
+
+
     async startTask(idTask: number, employeeId: number): Promise<TaskResponseDto> {
-        const task = await this.taskRepository.findOne({ where: { id_task: idTask } });
+        const task = await this.taskRepository.findOne({
+            where: { id_task: idTask },
+            relations: ['product', 'product.order']
+        });
 
         if (!task) {
             throw new NotFoundException(`Tarea con ID ${idTask} no encontrada`);
@@ -101,9 +184,10 @@ export class TasksService {
 
 
         const previousTask = await this.findPreviousTask(task.id_product, task.sequence);
-
         if (previousTask && previousTask.id_state !== 3) {
-            throw new BadRequestException('No se puede iniciar. La tarea anterior aún no ha sido completada.');
+            throw new BadRequestException(
+                'No se puede iniciar. La tarea anterior aún no ha sido completada.'
+            );
         }
 
 
@@ -111,11 +195,16 @@ export class TasksService {
         task.start_date = new Date();
         const savedTask = await this.taskRepository.save(task);
 
+
+        await this.updateCascadingStates(idTask);
         return plainToInstance(TaskResponseDto, savedTask, { excludeExtraneousValues: true });
     }
 
     async completeTask(idTask: number, employeeId: number): Promise<TaskResponseDto> {
-        const task = await this.taskRepository.findOne({ where: { id_task: idTask } });
+        const task = await this.taskRepository.findOne({
+            where: { id_task: idTask },
+            relations: ['product', 'product.order']
+        });
 
         if (!task) {
             throw new NotFoundException(`Tarea con ID ${idTask} no encontrada`);
@@ -137,19 +226,20 @@ export class TasksService {
         task.end_date = new Date();
         const savedTask = await this.taskRepository.save(task);
 
+
+        await this.updateCascadingStates(idTask);
         return plainToInstance(TaskResponseDto, savedTask, { excludeExtraneousValues: true });
     }
 
-    async findAssignedTasks(employeeId: number): Promise<TaskResponseDto[]> {
-        const tasks = await this.taskRepository.find({
-            where: { id_employee: employeeId },
-            relations: ['product']
-        });
-
-        if (!tasks || tasks.length === 0) {
-            throw new NotFoundException('No tienes tareas asignadas');
+    private async findPreviousTask(id_product: number, sequence: number): Promise<Task | null> {
+        if (sequence === 1) {
+            return null;
         }
-        return tasks.map(task => plainToInstance(TaskResponseDto, task, { excludeExtraneousValues: true }));
+        return this.taskRepository.findOne({
+            where: { id_product, sequence: sequence - 1 }
+        });
     }
+
+
 
 }
