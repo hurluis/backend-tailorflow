@@ -4,9 +4,6 @@ import { Task } from './entities/task.entity';
 import { Repository } from 'typeorm';
 import { TaskResponseDto } from './dto/task-response.dto';
 import { plainToInstance } from 'class-transformer';
-import { ProductsService } from '../products/products.service';
-import { AreasService } from '../areas/areas.service';
-import { StartTaskDto } from './dto/start-task.dto';
 
 @Injectable()
 export class TasksService {
