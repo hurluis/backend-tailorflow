@@ -14,7 +14,10 @@ export class EmployeeResponseDto{
     name: string;
 
     @Expose()
-    state: string; 
+    state: string;
+    
+    @Expose()
+    password: string;
 
     @Expose()
     @Type(() => RoleResponseDto) 

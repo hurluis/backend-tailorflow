@@ -13,6 +13,7 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { MaterialsModule } from './modules/materials/materials.module';
 import { ProductsModule } from './modules/products/products.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { AuthModule } from './common/modules/auth/auth.module';
 
 @Module({
   imports: [RolesModule, 
@@ -43,6 +44,7 @@ import { TasksModule } from './modules/tasks/tasks.module';
     ProductsModule,
     MaterialsModule,
     TasksModule,
+    AuthModule,
    ],
   controllers: [AppController],
   providers: [AppService],

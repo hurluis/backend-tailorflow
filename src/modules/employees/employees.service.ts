@@ -48,6 +48,16 @@ export class EmployeesService {
         return plainToInstance(EmployeeResponseDto, employee, { excludeExtraneousValues: true })
     }
 
+    async findByIdWithRole(id: number): Promise<Employee| null> {
+        const employee = await this.employeeRepository.findOne({where: { id_employee: id },relations: ['role']});
+
+        if (!employee) {
+            return null;
+        }
+
+        return employee;
+    }
+
     async createEmployee(createEmployee: CreateEmployeeDto): Promise<EmployeeResponseDto> {
         const existingEmployee = await this.employeeRepository.findOneBy({ cc: createEmployee.cc });
 
@@ -99,7 +109,7 @@ export class EmployeesService {
         const PENDING_STATE_ID = 1;
         const PROCESSING_STATE_ID = 2;
 
-        const employees = await this.employeeRepository.find({where: { id_role },relations: ['tasks']});
+        const employees = await this.employeeRepository.find({ where: { id_role }, relations: ['tasks'] });
 
         if (!employees || employees.length === 0) {
             throw new NotFoundException(`No hay empleados disponibles con el rol ID ${id_role}`);
@@ -113,7 +123,7 @@ export class EmployeesService {
                     task.id_state === PROCESSING_STATE_ID
             ) || [];
 
-            return {employee,workload: activeTasks.length};
+            return { employee, workload: activeTasks.length };
         });
 
         employeesWithWorkload.sort((a, b) => a.workload - b.workload);
