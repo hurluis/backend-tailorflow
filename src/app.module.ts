@@ -14,6 +14,7 @@ import { MaterialsModule } from './modules/materials/materials.module';
 import { ProductsModule } from './modules/products/products.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { AuthModule } from './common/modules/auth/auth.module';
+import { OracleProceduresModule } from './modules/oracleprocedures/oracle-procedures.module';
 
 @Module({
   imports: [RolesModule, 
@@ -45,6 +46,7 @@ import { AuthModule } from './common/modules/auth/auth.module';
     MaterialsModule,
     TasksModule,
     AuthModule,
+    OracleProceduresModule,
    ],
   controllers: [AppController],
   providers: [AppService],
