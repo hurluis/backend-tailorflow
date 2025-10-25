@@ -9,14 +9,13 @@ import { RolesGuard } from 'src/guards/roles/roles.guard';
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 
 @Controller('products')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@Roles('ADMIN')
 export class ProductsController {
 
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  @UseGuards(RolesGuard)
-  @Roles('ADMIN')
   async findAll(): Promise<BaseApplicationResponseDto<ProductResponseDto[]>> {
     const products = await this.productsService.findAll();
     return {
@@ -27,8 +26,6 @@ export class ProductsController {
   }
 
   @Get(':id')
-  @UseGuards(RolesGuard)
-  @Roles('ADMIN')
   async findById(@Param('id') id: string): Promise<BaseApplicationResponseDto<ProductResponseDto>> {
     const product = await this.productsService.findById(+id);
     return {
@@ -39,8 +36,6 @@ export class ProductsController {
   }
 
   @Post()
-  @UseGuards(RolesGuard)
-  @Roles('ADMIN')
   async createProduct(@Body() createProductDto: CreateProductDto): Promise<BaseApplicationResponseDto<ProductResponseDto>> {
     const product = await this.productsService.createProduct(createProductDto);
     return {
@@ -51,8 +46,6 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  @UseGuards(RolesGuard)
-  @Roles('ADMIN')
   async updateProduct(@Param('id') id: string,@Body() updateProductDto: UpdateProductDto): Promise<BaseApplicationResponseDto<ProductResponseDto>> {
     const product = await this.productsService.updateProduct(+id, updateProductDto);
     return {
@@ -63,8 +56,6 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  @UseGuards(RolesGuard)
-  @Roles('ADMIN')
   async deleteProduct(@Param('id') id: string): Promise<BaseApplicationResponseDto<ProductResponseDto>> {
     const product = await this.productsService.deleteProduct(+id);
     return {

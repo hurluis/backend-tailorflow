@@ -1,10 +1,15 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { OracleProceduresService } from './oracle-procedures.service';
 import { BaseApplicationResponseDto } from 'src/common/dto/base-application-response.dto';
 import { OrderTrackingDto } from './dto/order-tracking.dto';
 import { ProductLocationDto } from './dto/product-location.dto';
+import { Roles } from 'src/common/decorators/roles/roles.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/guards/roles/roles.guard';
 
 @Controller('oracle-procedures')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@Roles('ADMIN')
 export class OracleProceduresController {
   constructor(private readonly oracleProceduresService: OracleProceduresService) {}
 

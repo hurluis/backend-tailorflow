@@ -1,11 +1,16 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { BaseApplicationResponseDto } from 'src/common/dto/base-application-response.dto';
 import { CustomerResponseDto } from './dto/customer-response.dto';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/guards/roles/roles.guard';
+import { Roles } from 'src/common/decorators/roles/roles.decorator';
 
 @Controller('customers')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@Roles('ADMIN')
 export class CustomersController {
 
     constructor(private customersService: CustomersService) { }
@@ -51,5 +56,4 @@ export class CustomersController {
         };
     }
 
-    //deleteCustomer queda pendiente porque aun faltan relaciones con tablas importantes
 }

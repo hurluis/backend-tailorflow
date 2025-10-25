@@ -1,12 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { MaterialsService } from './materials.service';
 import { BaseApplicationResponseDto } from 'src/common/dto/base-application-response.dto';
 import { MaterialResponseDto } from './dto/material/material-response.dto';
 import { CreateMaterialDto } from './dto/material/create-material.dto';
 import { UpdateMaterialDto } from './dto/material/update-material.dto';
 import { MaterialConsumptionResponseDto } from './dto/material-consumption/material-consumption-response.dto';
+import { Roles } from 'src/common/decorators/roles/roles.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/guards/roles/roles.guard';
 
 @Controller('materials')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@Roles('ADMIN')
 export class MaterialsController {
 	constructor(private readonly materialsService: MaterialsService) {}
 
@@ -20,7 +25,7 @@ export class MaterialsController {
 		};
 	}
 
-	@Get('area/:id')
+	@Get(':id')
 	async findByArea(@Param('id') id: string): Promise<BaseApplicationResponseDto<MaterialResponseDto[]>> {
 		const materials = await this.materialsService.findMaterialByArea(+id);
 		return {

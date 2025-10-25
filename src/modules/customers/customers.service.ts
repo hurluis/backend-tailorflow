@@ -65,6 +65,4 @@ export class CustomersService {
         return plainToInstance(CustomerResponseDto, savedCustomer, { excludeExtraneousValues: true });
     }
 
-    //deleteCustomer queda pendiente porque aun faltan relaciones con tablas importantes
-
 }
