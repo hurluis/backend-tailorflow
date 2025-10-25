@@ -10,7 +10,6 @@ import { Employee } from "src/modules/employees/entities/employee.entity";
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     
-    // 1. INYECTAR EmployeesService
     constructor(
         private configService: ConfigService,
         private readonly employeesService: EmployeesService 

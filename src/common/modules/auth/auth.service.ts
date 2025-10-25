@@ -28,12 +28,12 @@ export class AuthService {
         const payload = {
             sub: validatedEmployee.id_employee,
             cc: validatedEmployee.cc,
-            id_rol: validatedEmployee.id_rol
+            id_rol: validatedEmployee.role.id_role
         };
 
     
         const access_token =  this.jwtService.sign(payload);
-        return new LoginResponseDto(access_token, loginDto)
+        return new LoginResponseDto(access_token, validatedEmployee)
     }
 
 }

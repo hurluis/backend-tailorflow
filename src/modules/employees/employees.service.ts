@@ -39,7 +39,7 @@ export class EmployeesService {
     }
 
     async findByCc(cc: string): Promise<EmployeeResponseDto> {
-        const employee = await this.employeeRepository.findOneBy({ cc: cc });
+        const employee = await this.employeeRepository.findOne({where: {cc}, relations: ['role']});
 
         if (!employee) {
             throw new NotFoundException('El trabajador no existe');
