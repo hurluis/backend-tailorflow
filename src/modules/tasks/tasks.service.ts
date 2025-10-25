@@ -240,6 +240,12 @@ export class TasksService {
         });
     }
 
+    async findByProductId(productId: number): Promise<Task[]> {
+        return await this.taskRepository.find({where: { id_product: productId },relations: ['state']});
+    }
 
+    async deleteByProductId(productId: number): Promise<void> {
+        await this.taskRepository.delete({ id_product: productId });
+    }
 
 }

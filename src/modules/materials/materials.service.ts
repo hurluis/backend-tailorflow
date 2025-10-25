@@ -202,7 +202,7 @@ export class MaterialsService {
         return plainToInstance(MaterialConsumptionResponseDto, consumptionWithRelations, { excludeExtraneousValues: true });
     }
 
-    async validateMaterial(materialsConsumptionDto: ProductMaterialDto[]): Promise<any>{
+    async validateMaterial(materialsConsumptionDto: ProductMaterialDto[]): Promise<any> {
 
         const materialPromises = materialsConsumptionDto.map(async (mat) => {
             const material = await this.materialRepository.findOne({
@@ -229,7 +229,26 @@ export class MaterialsService {
             };
         });
 
-        return  await Promise.all(materialPromises);
+        return await Promise.all(materialPromises);
+    }
+
+    async findConsumptionsByTaskId(taskId: number): Promise<MaterialConsumption[]> {
+        return await this.materialConsumptionRepository.find({where: { id_task: taskId }});
+    }
+
+    async returnMaterialStock(materialId: number, quantity: number): Promise<void> {
+        const material = await this.materialRepository.findOne({where: { id_material: materialId }});
+
+        if (!material) {
+            throw new NotFoundException(`Material ${materialId} no encontrado`);
+        }
+
+        material.current_stock += quantity;
+        await this.materialRepository.save(material);
+    }
+
+    async deleteMaterialConsumptionsByTask(taskId: number): Promise<void> {
+        await this.materialConsumptionRepository.delete({ id_task: taskId });
     }
 
 }

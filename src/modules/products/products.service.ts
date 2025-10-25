@@ -182,19 +182,42 @@ export class ProductsService {
 
     }*/
 
-    async deleteProduct(id: number) {
+
+    async deleteProduct(id: number): Promise<ProductResponseDto> {
         const existingProduct = await this.productRepository.findOneBy({ id_product: id });
 
         if (!existingProduct) {
-            throw new NotFoundException('El producto no existe')
+            throw new NotFoundException('El producto no existe');
         }
 
-        if (existingProduct.id_state != 1) {
-            throw new BadRequestException('El producto ya se encuentra en producción, no puedes eliminarlo');
+        const tasks = await this.tasksService.findByProductId(id);
+        const tasksInProgress = tasks.filter(task => task.id_state !== 1);
+
+        if (tasksInProgress.length > 0) {
+            throw new BadRequestException('No se puede eliminar el producto porque tiene tareas en proceso o completadas');
         }
 
-        const deletedProduct = await this.productRepository.remove(existingProduct);
-        return plainToInstance(ProductResponseDto, deletedProduct, { excludeExtraneousValues: true });
+        try {
+            for (const task of tasks) {
+                const materialConsumptions = await this.materialsService.findConsumptionsByTaskId(task.id_task);
+
+                for (const consumption of materialConsumptions) {
+                    await this.materialsService.returnMaterialStock(consumption.id_material,consumption.quantity);
+                }
+
+                await this.materialsService.deleteMaterialConsumptionsByTask(task.id_task);
+            }
+
+            await this.tasksService.deleteByProductId(id);
+
+
+            const deletedProduct = await this.productRepository.remove(existingProduct);
+
+            return plainToInstance(ProductResponseDto, deletedProduct, { excludeExtraneousValues: true });
+
+        } catch (error) {
+            throw new BadRequestException(`Error al eliminar producto: ${error.message}`);
+        }
     }
 
 }
