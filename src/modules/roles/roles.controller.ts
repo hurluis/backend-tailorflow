@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { BaseApplicationResponseDto } from 'src/common/dto/base-application-response.dto';
 import { RoleResponseDto } from './dto/role-response.dto';
@@ -6,8 +6,13 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { UpdateRoleResposeDto } from './dto/update-role-response.dto';
 import { plainToInstance } from 'class-transformer';
+import { Roles } from 'src/common/decorators/roles/roles.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/guards/roles/roles.guard';
 
 @Controller('roles')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@Roles('ADMIN')
 export class RolesController {
     constructor(private readonly rolesService: RolesService){}
 
