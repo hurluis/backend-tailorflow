@@ -36,6 +36,16 @@ export class EmployeesController {
         }
     }
 
+    @Get('cc/:cc')
+    async findByCc(@Param('cc') cc: string):Promise<BaseApplicationResponseDto<EmployeeResponseDto>>{
+       const employee = await this.employessService.findByCc(cc);
+        return{
+            statusCode: 200, 
+            message: 'Trabajador obtenido correctamente',
+            data: employee
+        } 
+    }
+
     @Post()
     async createEmployee(@Body() createEmployee: CreateEmployeeDto): Promise<BaseApplicationResponseDto<EmployeeResponseDto>>{
         const newEmployee = await this.employessService.createEmployee(createEmployee);

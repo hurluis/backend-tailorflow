@@ -8,13 +8,23 @@ import { MaterialConsumptionResponseDto } from './dto/material-consumption/mater
 import { Roles } from 'src/common/decorators/roles/roles.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/guards/roles/roles.guard';
+import { CheckStockDto } from './dto/material/check-stock.dto';
 
 @Controller('materials')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Roles('ADMIN')
 export class MaterialsController {
-	constructor(private readonly materialsService: MaterialsService) {}
+	constructor(private readonly materialsService: MaterialsService) { }
 
+	@Post('check-stock')
+	async checkStock(@Body() checkStockDto: CheckStockDto): Promise<BaseApplicationResponseDto<any>> {
+		const result = await this.materialsService.checkStock(checkStockDto.materials);
+		return {
+			statusCode: 200,
+			message: result.message,
+			data: result,
+		};
+	}
 	@Get()
 	async findAll(): Promise<BaseApplicationResponseDto<MaterialResponseDto[]>> {
 		const materials = await this.materialsService.findAllMaterials();

@@ -233,11 +233,11 @@ export class MaterialsService {
     }
 
     async findConsumptionsByTaskId(taskId: number): Promise<MaterialConsumption[]> {
-        return await this.materialConsumptionRepository.find({where: { id_task: taskId }});
+        return await this.materialConsumptionRepository.find({ where: { id_task: taskId } });
     }
 
     async returnMaterialStock(materialId: number, quantity: number): Promise<void> {
-        const material = await this.materialRepository.findOne({where: { id_material: materialId }});
+        const material = await this.materialRepository.findOne({ where: { id_material: materialId } });
 
         if (!material) {
             throw new NotFoundException(`Material ${materialId} no encontrado`);
@@ -249,6 +249,55 @@ export class MaterialsService {
 
     async deleteMaterialConsumptionsByTask(taskId: number): Promise<void> {
         await this.materialConsumptionRepository.delete({ id_task: taskId });
+    }
+
+    async checkStock(materials: { id_material: number; quantity: number }[]): Promise<{
+        hasStock: boolean;
+        message: string;
+        insufficientMaterials?: { id_material: number; name: string; available: number; required: number }[];
+    }> {
+        const insufficientMaterials: {
+            id_material: number;
+            name: string;
+            available: number;
+            required: number
+        }[] = [];
+
+        for (const item of materials) {
+            const material = await this.materialRepository.findOne({
+                where: { id_material: item.id_material }
+            });
+
+            if (!material) {
+                throw new NotFoundException(`Material con ID ${item.id_material} no encontrado`);
+            }
+
+            if (material.current_stock < item.quantity) {
+                insufficientMaterials.push({
+                    id_material: material.id_material,
+                    name: material.name,
+                    available: material.current_stock,
+                    required: item.quantity
+                });
+            }
+        }
+
+        if (insufficientMaterials.length > 0) {
+            const details = insufficientMaterials
+                .map(m => `${m.name}: disponible ${m.available}, requerido ${m.required}`)
+                .join('; ');
+
+            return {
+                hasStock: false,
+                message: `Stock insuficiente para: ${details}`,
+                insufficientMaterials
+            };
+        }
+
+        return {
+            hasStock: true,
+            message: 'Stock suficiente para todos los materiales'
+        };
     }
 
 }
