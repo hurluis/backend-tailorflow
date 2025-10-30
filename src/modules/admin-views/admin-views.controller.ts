@@ -1,7 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from '../../guards/roles/roles.guard';
-import { Roles } from '../../common/decorators/roles/roles.decorator';
+import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { BaseApplicationResponseDto } from '../../common/dto/base-application-response.dto';
 
 import { AdminViewsService } from './admin-views.service';
@@ -14,11 +11,9 @@ import { TareasAtrasadasResponseDto } from './dto/tareas-atrasadas-response.dto'
 
 /**
  * Controlador para las vistas de administrador
- * Todos los endpoints están protegidos y requieren rol de ADMIN
+ * TEMPORALMENTE SIN AUTENTICACIÓN - Solo para pruebas de desarrollo
  */
 @Controller('admin-views')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
-@Roles('ADMIN')
 export class AdminViewsController {
   constructor(private readonly adminViewsService: AdminViewsService) {}
 
