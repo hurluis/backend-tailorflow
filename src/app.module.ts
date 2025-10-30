@@ -15,6 +15,7 @@ import { ProductsModule } from './modules/products/products.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { AuthModule } from './common/modules/auth/auth.module';
 import { OracleProceduresModule } from './modules/oracleprocedures/oracle-procedures.module';
+import { AdminViewsModule } from './modules/admin-views/admin-views.module';
 
 @Module({
   imports: [RolesModule, 
@@ -32,7 +33,10 @@ import { OracleProceduresModule } from './modules/oracleprocedures/oracle-proced
       serviceName: configService.get<string>('SERVICE_NAME'),
       schema: configService.get<string>('DB_SCHEMA'),
       timezone: 'local',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'], 
+      entities: [
+        __dirname + '/**/*.entity{.ts,.js}',
+        __dirname + '/**/*.view{.ts,.js}'
+      ],
       synchronize: false,
     })
   }),
@@ -47,6 +51,7 @@ import { OracleProceduresModule } from './modules/oracleprocedures/oracle-proced
     TasksModule,
     AuthModule,
     OracleProceduresModule,
+    AdminViewsModule,
    ],
   controllers: [AppController],
   providers: [AppService],
