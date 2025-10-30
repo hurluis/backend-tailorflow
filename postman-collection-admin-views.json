@@ -1,0 +1,305 @@
+{
+  "info": {
+    "name": "TailorFlow - Admin Views",
+    "description": "Colección de Postman para probar los endpoints de vistas de administrador.\n\n**Instrucciones:**\n1. Importar esta colección en Postman\n2. Configurar la variable de entorno `base_url` = `http://localhost:3000`\n3. Ejecutar el request de Login primero\n4. Copiar el `access_token` y pegarlo en la variable `token`\n5. Ejecutar los demás endpoints\n\n**Nota:** Todos los endpoints requieren rol ADMIN",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Authentication",
+      "item": [
+        {
+          "name": "Login - Get Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Guardar el token automáticamente",
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.access_token) {",
+                  "        pm.collectionVariables.set('token', jsonData.data.access_token);",
+                  "        console.log('✓ Token guardado exitosamente');",
+                  "        console.log('Usuario:', jsonData.data.employee.name);",
+                  "        console.log('Rol:', jsonData.data.employee.role.name);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cc\": \"123456789\",\n  \"password\": \"tu_password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Obtiene el token JWT para autenticación.\n\n**IMPORTANTE:** Actualiza el `cc` y `password` con credenciales de un usuario ADMIN.\n\nEl token se guarda automáticamente en la variable `token`."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "1. Detalle de Productos",
+      "item": [
+        {
+          "name": "Get Todos los Productos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin-views/detalle-productos",
+              "host": ["{{base_url}}"],
+              "path": ["admin-views", "detalle-productos"]
+            },
+            "description": "Obtiene el detalle completo de todos los productos con:\n- Categoría\n- Cliente\n- Pedido\n- Estado del producto\n- Área actual\n- Empleado asignado\n- Fechas de inicio/fin\n- Estado de la tarea"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Producto por ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin-views/detalle-productos/1",
+              "host": ["{{base_url}}"],
+              "path": ["admin-views", "detalle-productos", "1"]
+            },
+            "description": "Obtiene el detalle de un producto específico por su ID.\n\n**Nota:** Cambia el `1` por el ID del producto que quieras consultar."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Consumo de Materiales",
+      "item": [
+        {
+          "name": "Get Todo el Consumo",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin-views/consumo-materiales",
+              "host": ["{{base_url}}"],
+              "path": ["admin-views", "consumo-materiales"]
+            },
+            "description": "Obtiene el resumen de consumo de materiales agrupado por área.\n\nIncluye:\n- Área de producción\n- Material consumido\n- Total consumido\n- Número de tareas asociadas"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Consumo por Área",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin-views/consumo-materiales/area/Corte",
+              "host": ["{{base_url}}"],
+              "path": ["admin-views", "consumo-materiales", "area", "Corte"]
+            },
+            "description": "Obtiene el consumo de materiales filtrado por área específica.\n\n**Nota:** Reemplaza `Corte` con el nombre del área que desees consultar."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Alertas de Stock",
+      "item": [
+        {
+          "name": "Get Todas las Alertas",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin-views/alertas-stock",
+              "host": ["{{base_url}}"],
+              "path": ["admin-views", "alertas-stock"]
+            },
+            "description": "Obtiene todas las alertas de materiales cuyo stock actual está en o bajo el nivel mínimo.\n\nIncluye:\n- Material\n- Área asociada\n- Stock actual\n- Stock mínimo\n- Diferencia (puede ser positiva, cero o negativa)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Alertas Críticas",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin-views/alertas-stock/critico",
+              "host": ["{{base_url}}"],
+              "path": ["admin-views", "alertas-stock", "critico"]
+            },
+            "description": "Obtiene solo las alertas críticas (materiales con stock POR DEBAJO del mínimo, diferencia negativa).\n\nÚtil para priorizar compras urgentes."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Tareas Atrasadas",
+      "item": [
+        {
+          "name": "Get Todas las Tareas Atrasadas",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin-views/tareas-atrasadas",
+              "host": ["{{base_url}}"],
+              "path": ["admin-views", "tareas-atrasadas"]
+            },
+            "description": "Obtiene todas las tareas que están en proceso y el tiempo que llevan en curso.\n\nIncluye:\n- ID de la tarea\n- Área de producción\n- Empleado asignado\n- Fecha de inicio\n- Días en curso\n- Producto afectado"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tareas por Área",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin-views/tareas-atrasadas/area/Corte",
+              "host": ["{{base_url}}"],
+              "path": ["admin-views", "tareas-atrasadas", "area", "Corte"]
+            },
+            "description": "Obtiene tareas atrasadas filtradas por área de producción.\n\n**Nota:** Reemplaza `Corte` con el nombre del área que desees consultar."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tareas por Días",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin-views/tareas-atrasadas/dias/20",
+              "host": ["{{base_url}}"],
+              "path": ["admin-views", "tareas-atrasadas", "dias", "20"]
+            },
+            "description": "Obtiene tareas que exceden un número específico de días en curso.\n\n**Nota:** Cambia `20` por el número de días que desees filtrar.\n\nEjemplo:\n- `/dias/10` - Tareas con 10 o más días\n- `/dias/30` - Tareas con 30 o más días"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
