@@ -14,11 +14,11 @@ import { TareasAtrasadasResponseDto } from './dto/tareas-atrasadas-response.dto'
 
 /**
  * Controlador para las vistas de administrador
- * Todos los endpoints están protegidos y requieren rol de ADMIN
+ * AUTENTICACIÓN DESHABILITADA PARA PRUEBAS CON POSTMAN
  */
 @Controller('admin-views')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
-@Roles('ADMIN')
+// @UseGuards(AuthGuard('jwt'), RolesGuard)
+// @Roles('ADMIN')
 export class AdminViewsController {
   constructor(private readonly adminViewsService: AdminViewsService) {}
 
